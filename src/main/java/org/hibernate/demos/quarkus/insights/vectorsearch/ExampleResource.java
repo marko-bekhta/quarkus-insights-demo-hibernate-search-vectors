@@ -1,4 +1,4 @@
-package org.hibernate.demos.quarklus.insights.vectorsearch;
+package org.hibernate.demos.quarkus.insights.vectorsearch;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

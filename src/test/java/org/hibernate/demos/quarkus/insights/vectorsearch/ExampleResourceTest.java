@@ -1,4 +1,4 @@
-package org.hibernate.demos.quarklus.insights.vectorsearch;
+package org.hibernate.demos.quarkus.insights.vectorsearch;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
