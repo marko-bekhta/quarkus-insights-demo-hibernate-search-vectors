@@ -11,6 +11,7 @@ import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Book;
 import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Genre;
 import org.hibernate.demos.quarkus.insights.vectorsearch.dto.BookDto;
 import org.hibernate.demos.quarkus.insights.vectorsearch.dto.Result;
+import org.hibernate.demos.quarkus.insights.vectorsearch.search.TextEmbeddingModelBridge;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
@@ -23,6 +24,9 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @ApplicationScoped
 public class BookService {
+
+	@Inject
+	TextEmbeddingModelBridge textEmbeddingModelBridge;
 
 	@Inject
 	ApplicationConfiguration configuration;
@@ -88,9 +92,14 @@ public class BookService {
 		SearchResult<Book> fetched = session.search( Book.class )
 				.where( f -> f.bool()
 						.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
-						.must( f.knn( total ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() )
+						.should( f.knn( total ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() )
 								.requiredMinimumSimilarity( 0.70f )
 						)
+						.should( f.knn( total ).field( "summary_embedding" )
+								.matching( textEmbeddingModelBridge.toEmbedding( book.getSummary() ) )
+								//.requiredMinimumSimilarity( 0.70f )
+						)
+						.minimumShouldMatchNumber( 1 )
 				).fetch( total );
 		return new Result<>( Math.min( total, fetched.total().hitCountLowerBound() ), fetched.hits().stream().map( BookDto::new ).toList() );
 	}

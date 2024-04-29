@@ -3,14 +3,14 @@ package org.hibernate.demos.quarkus.insights.vectorsearch.domain;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.hibernate.demos.quarkus.insights.vectorsearch.search.TextEmbeddingModelBridge;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 
-import io.quarkus.runtime.configuration.PathConverter;
-import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,10 +29,10 @@ public class Book {
 	private String title;
 
 	@FullTextField
-//	@VectorField(name = "summary_embedding",
-//			dimension = EmbeddingModelBridge.DIMENSION,
-//			vectorSimilarity = VectorSimilarity.COSINE,
-//			valueBridge = @ValueBridgeRef(type = EmbeddingModelBridge.class))
+	@VectorField(name = "summary_embedding",
+			dimension = TextEmbeddingModelBridge.DIMENSION,
+			vectorSimilarity = VectorSimilarity.COSINE,
+			valueBridge = @ValueBridgeRef(type = TextEmbeddingModelBridge.class))
 	private String summary;
 
 	@ManyToOne
