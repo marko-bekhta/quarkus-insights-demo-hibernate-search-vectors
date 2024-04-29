@@ -25,7 +25,7 @@ public class BookDto extends Identifiable<Long> {
 		this.title = book.getTitle();
 		this.summary = book.getSummary();
 		this.genres = book.getGenres();
-		this.coverLocation = book.getCoverLocation().toString();
+		this.coverLocation = book.getCoverLocation().getFileName().toString();
 		this.author = new AuthorDto( book.getAuthor() );
 
 	}

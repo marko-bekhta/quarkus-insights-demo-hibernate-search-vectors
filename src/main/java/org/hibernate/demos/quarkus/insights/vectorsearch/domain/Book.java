@@ -3,6 +3,7 @@ package org.hibernate.demos.quarkus.insights.vectorsearch.domain;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -43,7 +44,7 @@ public class Book {
 
 	private Path coverLocation;
 
-	@VectorField(dimension = 512)
+	@VectorField(dimension = 512, vectorSimilarity = VectorSimilarity.COSINE)
 	private float[] coverEmbedding;
 
 

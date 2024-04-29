@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Genre;
 import org.hibernate.demos.quarkus.insights.vectorsearch.dto.BookDto;
+import org.hibernate.demos.quarkus.insights.vectorsearch.dto.Result;
 import org.hibernate.demos.quarkus.insights.vectorsearch.service.BookService;
 
 import org.jboss.resteasy.reactive.RestQuery;
@@ -47,7 +48,7 @@ public class BookResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<BookDto> findBooks(
+	public Result<BookDto> findBooks(
 			@RestQuery String q,
 			@RestQuery List<Genre> genres,
 			@RestQuery @DefaultValue("0") int page
@@ -58,9 +59,7 @@ public class BookResource {
 	@GET
 	@Path("/{id}/similar")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<BookDto> findBooks(
-			Long id
-	) {
+	public Result<BookDto> findBooks(Long id) {
 		return service.similarBooks( id );
 	}
 }

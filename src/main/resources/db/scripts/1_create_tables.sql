@@ -1,4 +1,5 @@
 create sequence public.book_seq increment by 50;
+create sequence public.author_seq increment by 50;
 
 create table public.author
 (
@@ -24,7 +25,7 @@ alter table public.book
 create table public.book_genres
 (
     genres  smallint
-        constraint book_genres_genres_check check ((genres >= 0) AND (genres <= 8)),
+        constraint book_genres_genres_check check ((genres >= 0) AND (genres <= 13)),
     book_id bigint not null
         constraint fk_book references public.book
 );

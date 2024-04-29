@@ -6,6 +6,8 @@
 
     <changeSet author="marko" id="1">
         <sqlFile path="db/scripts/1_create_tables.sql"/>
-        <sqlFile path="db/scripts/2_add_authors.sql"/>
     </changeSet>
+<!--    <changeSet author="marko" id="2">-->
+<!--        <sqlFile path="db/scripts/2_add_authors.sql"/>-->
+<!--    </changeSet>-->
 </databaseChangeLog>

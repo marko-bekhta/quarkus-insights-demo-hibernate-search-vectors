@@ -1,0 +1,62 @@
+:root {
+    --background: white;
+    --text-color: black;
+    --input-border-color: #5996E5;
+    --top-nav-bg: black;
+}
+
+body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    background-color: var(--background); /* Quarkus background color */
+    color: var(--text-color); /* Quarkus text color */
+    margin: 0;
+}
+
+nav.search {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    background-color: var(--top-nav-bg);
+    gap: 20px;
+    padding: 0 10px;
+    @media screen and (max-width: 768px) {
+        gap: 10px;
+    }
+
+}
+
+.logo {
+    background-position: left;
+    background-repeat: no-repeat;
+    height: 50px;
+    width: 200px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    align-content: center;
+    text-decoration: none;
+}
+
+book-form {
+    flex-grow: 1;
+}
+
+.title {
+    color: #007bff; /* Quarkus primary color */
+}
+
+.filters {
+    padding: 15px;
+    border-radius: 5px;
+}
+
+book-target {
+    display: block;
+    padding: 30px;
+
+    @media screen and (max-width: 768px) {
+       padding: 10px;
+    }
+}
+

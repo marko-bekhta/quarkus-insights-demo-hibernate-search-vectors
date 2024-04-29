@@ -10,6 +10,8 @@ import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Author;
 import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Book;
 import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Genre;
 import org.hibernate.demos.quarkus.insights.vectorsearch.dto.BookDto;
+import org.hibernate.demos.quarkus.insights.vectorsearch.dto.Result;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -35,7 +37,7 @@ public class BookService {
 	SearchSession session;
 
 	@Transactional
-	public void save(BookDto book) {
+	public Book save(BookDto book) {
 		Book bookEntity;
 		if ( book.getId() != null ) {
 			bookEntity = entityManager.getReference( Book.class, book.getId() );
@@ -50,12 +52,19 @@ public class BookService {
 		bookEntity.setTitle( book.getTitle() );
 		bookEntity.setGenres( book.getGenres() );
 		bookEntity.setSummary( book.getSummary() );
+
+		return bookEntity;
 	}
 
 	@Transactional
 	public void addCoverImage(Long id, byte[] coverImage) {
 		Book bookEntity = entityManager.getReference( Book.class, id );
 
+		addCoverImage( bookEntity, coverImage );
+	}
+
+	@Transactional
+	public void addCoverImage(Book bookEntity, byte[] coverImage) {
 		bookEntity.setCoverLocation( saveImage( coverImage ) );
 		bookEntity.setCoverEmbedding( embeddingService.imageEmbedding( bookEntity.getCoverLocation() ).get( 0 ) );
 	}
@@ -73,30 +82,35 @@ public class BookService {
 		return path;
 	}
 
-	public List<BookDto> similarBooks(Long id) {
+	public Result<BookDto> similarBooks(Long id) {
 		Book book = entityManager.find( Book.class, id );
-		return session.search( Book.class )
+		int total = 10;
+		SearchResult<Book> fetched = session.search( Book.class )
 				.where( f -> f.bool()
-						.should( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
-						.should( f.knn( 15 ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() ) )
-				).fetchHits( 10 )
-				.stream()
-				.map( BookDto::new )
-				.toList();
+						.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
+						.must( f.knn( total ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() )
+								.requiredMinimumSimilarity( 0.70f )
+						)
+				).fetch( total );
+		return new Result<>( Math.min( total, fetched.total().hitCountLowerBound() ), fetched.hits().stream().map( BookDto::new ).toList() );
 	}
 
-	public List<BookDto> findBooks(String q, List<Genre> genres, int page) {
-		return session.search( Book.class )
-				.where( f -> f.bool()
-						.must( f.terms().field( "genres" ).matchingAny( genres ) )
-						.must( f.match().field( "title" )
+	public Result<BookDto> findBooks(String q, List<Genre> genres, int page) {
+		SearchResult<Book> fetched = session.search( Book.class )
+				.where( (f, root) -> {
+					root.add( f.matchAll() );
+
+					if ( !genres.isEmpty() ) {
+						root.add( f.terms().field( "genres" ).matchingAny( genres ) );
+					}
+					if ( q != null && !q.isEmpty() ) {
+						root.add( f.match().field( "title" )
 								.field( "summary" )
-								.field( "author" )
-								.matching( q )
-						)
-				).fetchHits( page * 10, 10 )
-				.stream()
-				.map( BookDto::new )
-				.toList();
+								//.field( "author" )
+								.matching( q ) );
+					}
+
+				} ).fetch( page * 10, 10 );
+		return new Result<>( fetched.total().hitCountLowerBound(), fetched.hits().stream().map( BookDto::new ).toList() );
 	}
 }
