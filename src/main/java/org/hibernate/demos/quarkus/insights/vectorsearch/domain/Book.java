@@ -3,9 +3,14 @@ package org.hibernate.demos.quarkus.insights.vectorsearch.domain;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.hibernate.demos.quarkus.insights.vectorsearch.search.AuthorBridge;
+import org.hibernate.demos.quarkus.insights.vectorsearch.search.PathBridge;
 import org.hibernate.demos.quarkus.insights.vectorsearch.search.TextEmbeddingModelBridge;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -25,10 +30,10 @@ public class Book {
 	@GeneratedValue
 	private Long id;
 
-	@FullTextField
+	@FullTextField(analyzer = "index", searchAnalyzer = "search", highlightable = Highlightable.FAST_VECTOR)
 	private String title;
 
-	@FullTextField
+	@FullTextField(analyzer = "index", searchAnalyzer = "search", highlightable = Highlightable.FAST_VECTOR)
 	@VectorField(name = "summary_embedding",
 			dimension = TextEmbeddingModelBridge.DIMENSION,
 			vectorSimilarity = VectorSimilarity.COSINE,
@@ -36,12 +41,17 @@ public class Book {
 	private String summary;
 
 	@ManyToOne
+	@FullTextField(
+			analyzer = "index", searchAnalyzer = "search", highlightable = Highlightable.FAST_VECTOR,
+			valueBridge = @ValueBridgeRef(type = AuthorBridge.class)
+	)
 	private Author author;
 
 	@KeywordField
 	@ElementCollection
 	private Set<Genre> genres;
 
+	@KeywordField(extraction = @ContainerExtraction(extract = ContainerExtract.NO), valueBridge = @ValueBridgeRef(type = PathBridge.class))
 	private Path coverLocation;
 
 	@VectorField(dimension = 512, vectorSimilarity = VectorSimilarity.COSINE)

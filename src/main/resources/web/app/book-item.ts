@@ -22,8 +22,8 @@ export class BookItem extends LitElement {
             }
         }
 
-        .highlighted {
-            font-weight: bold;
+        .highlight {
+            font-weight: bolder;
         }
 
         .book-guide {

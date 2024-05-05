@@ -172,12 +172,8 @@ export class BookForm extends LitElement {
     }
 
     private _handleNextPage = (e: CustomEvent) => {
-        if (this._requestType === 'simple') {
-            this._page++;
-            this._search();
-        } else {
-
-        }
+        this._page++;
+        this._search();
     }
 
     private _handleFindSimilar(e: CustomEvent) {
@@ -200,7 +196,7 @@ export class BookForm extends LitElement {
         const timeoutId = setTimeout(() => controller.abort(), 1000)
         const apiPath = this._requestType === 'simple'
             ? `${this.server}/api/books?${(new URLSearchParams(queryParams)).toString()}`
-            : `${this.server}/api/books/${this._formData.book}/similar`;
+            : `${this.server}/api/books/${this._formData.book}/similar?${(new URLSearchParams(queryParams)).toString()}`;
         const response = await fetch(apiPath, {
             method: method,
             signal: controller.signal,

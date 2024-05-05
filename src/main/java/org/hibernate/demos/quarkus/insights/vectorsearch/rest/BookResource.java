@@ -59,7 +59,7 @@ public class BookResource {
 	@GET
 	@Path("/{id}/similar")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Result<BookDto> findBooks(Long id) {
-		return service.similarBooks( id );
+	public Result<BookDto> findBooks(Long id, @RestQuery @DefaultValue("0") int page) {
+		return service.similarBooks( id, page );
 	}
 }

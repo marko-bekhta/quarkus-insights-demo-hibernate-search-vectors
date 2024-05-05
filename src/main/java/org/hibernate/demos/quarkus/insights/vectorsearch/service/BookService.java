@@ -69,8 +69,9 @@ public class BookService {
 
 	@Transactional
 	public void addCoverImage(Book bookEntity, byte[] coverImage) {
-		bookEntity.setCoverLocation( saveImage( coverImage ) );
-		bookEntity.setCoverEmbedding( embeddingService.imageEmbedding( bookEntity.getCoverLocation() ).get( 0 ) );
+		Path path = saveImage( coverImage );
+		bookEntity.setCoverLocation( path.getFileName() );
+		bookEntity.setCoverEmbedding( embeddingService.imageEmbedding( path ).get( 0 ) );
 	}
 
 
@@ -86,26 +87,27 @@ public class BookService {
 		return path;
 	}
 
-	public Result<BookDto> similarBooks(Long id) {
+	public Result<BookDto> similarBooks(Long id, int page) {
 		Book book = entityManager.find( Book.class, id );
-		int total = 10;
+		int total = 20;
 		SearchResult<Book> fetched = session.search( Book.class )
 				.where( f -> f.bool()
-						.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
+						//.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
 						.should( f.knn( total ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() )
 								.requiredMinimumSimilarity( 0.70f )
 						)
-						.should( f.knn( total ).field( "summary_embedding" )
-								.matching( textEmbeddingModelBridge.toEmbedding( book.getSummary() ) )
-								//.requiredMinimumSimilarity( 0.70f )
-						)
+//						.should( f.knn( total ).field( "summary_embedding" )
+//										.matching( textEmbeddingModelBridge.toEmbedding( book.getSummary() ) )
+//								//.requiredMinimumSimilarity( 0.70f )
+//						)
 						.minimumShouldMatchNumber( 1 )
-				).fetch( total );
-		return new Result<>( Math.min( total, fetched.total().hitCountLowerBound() ), fetched.hits().stream().map( BookDto::new ).toList() );
+				).fetch( page * 10, 10 );
+		return new Result<>( fetched.total().hitCountLowerBound(), fetched.hits().stream().map( BookDto::new ).toList() );
 	}
 
 	public Result<BookDto> findBooks(String q, List<Genre> genres, int page) {
-		SearchResult<Book> fetched = session.search( Book.class )
+		SearchResult<BookDto> fetched = session.search( Book.class )
+				.select( BookDto.class )
 				.where( (f, root) -> {
 					root.add( f.matchAll() );
 
@@ -119,7 +121,13 @@ public class BookService {
 								.matching( q ) );
 					}
 
-				} ).fetch( page * 10, 10 );
-		return new Result<>( fetched.total().hitCountLowerBound(), fetched.hits().stream().map( BookDto::new ).toList() );
+				} )
+				.highlighter( f -> f.fastVector()
+						.tag( "<span class=highlight>", "</span>" )
+						.numberOfFragments( 1 )
+						.fragmentSize( 10_000 )
+						.noMatchSize( 10_000 )
+				).fetch( page * 10, 10 );
+		return new Result<>( fetched.total().hitCountLowerBound(), fetched.hits() );
 	}
 }
