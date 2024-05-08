@@ -3,16 +3,18 @@ package org.hibernate.demos.quarkus.insights.vectorsearch.domain;
 import java.nio.file.Path;
 import java.util.Set;
 
-import org.hibernate.demos.quarkus.insights.vectorsearch.search.AuthorBridge;
 import org.hibernate.demos.quarkus.insights.vectorsearch.search.PathBridge;
 import org.hibernate.demos.quarkus.insights.vectorsearch.search.TextEmbeddingModelBridge;
 import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 
@@ -41,10 +43,8 @@ public class Book {
 	private String summary;
 
 	@ManyToOne
-	@FullTextField(
-			analyzer = "index", searchAnalyzer = "search", highlightable = Highlightable.FAST_VECTOR,
-			valueBridge = @ValueBridgeRef(type = AuthorBridge.class)
-	)
+	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Author author;
 
 	@KeywordField

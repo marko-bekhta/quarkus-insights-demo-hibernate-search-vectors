@@ -42,7 +42,7 @@ public class BookDto extends Identifiable<Long> {
 			@IdProjection Long id,
 			@HighlightProjection(path = "title") List<String> title,
 			@HighlightProjection(path = "summary") List<String> summary,
-			@FieldProjection(convert = ValueConvert.NO) String author,
+			@FieldProjection(path = "author.name", convert = ValueConvert.NO) String author,
 			@FieldProjection(convert = ValueConvert.NO) String coverLocation,
 			@FieldProjection List<Genre> genres) {
 		this.id = id;

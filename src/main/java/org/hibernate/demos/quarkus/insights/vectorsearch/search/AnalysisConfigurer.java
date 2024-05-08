@@ -7,8 +7,18 @@ import io.quarkus.hibernate.search.orm.elasticsearch.SearchExtension;
 
 @SearchExtension
 public class AnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
+
+	private static final String[] SYNONYMS = new String[] {
+			"wizard, sorcerer, magician",
+			"detective, investigator, policeman",
+			"LAPD, police"
+	};
+
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
+		context.tokenFilter( "synonyms_filter" )
+				.type("synonym_graph")
+				.param("synonyms", SYNONYMS);
 		context.tokenFilter( "autocomplete" )
 				.type( "edge_ngram" )
 				.param( "min_gram", 2 )
@@ -30,7 +40,8 @@ public class AnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 						"lowercase",
 						"stemmer",
 						"stop",
-						"asciifolding"
+						"asciifolding",
+						"synonyms_filter"
 				);
 	}
 }

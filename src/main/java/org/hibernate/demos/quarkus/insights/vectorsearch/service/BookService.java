@@ -90,19 +90,24 @@ public class BookService {
 	public Result<BookDto> similarBooks(Long id, int page) {
 		Book book = entityManager.find( Book.class, id );
 		int total = 20;
-		SearchResult<Book> fetched = session.search( Book.class )
+		SearchResult<BookDto> fetched = session.search( Book.class )
+				.select( BookDto.class )
 				.where( f -> f.bool()
-						//.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
+						.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
 						.should( f.knn( total ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() )
-								.requiredMinimumSimilarity( 0.70f )
+								.requiredMinimumSimilarity( 0.60f )
+								.filter( f.not( f.id().matching( id ) ) )
 						)
-//						.should( f.knn( total ).field( "summary_embedding" )
-//										.matching( textEmbeddingModelBridge.toEmbedding( book.getSummary() ) )
-//								//.requiredMinimumSimilarity( 0.70f )
-//						)
+						.should( f.knn( total ).field( "summary_embedding" )
+								.matching( textEmbeddingModelBridge.toEmbedding( book.getSummary() ) )
+								.requiredMinimumSimilarity( 0.70f )
+								.filter( f.not( f.id().matching( id ) ) )
+						)
 						.minimumShouldMatchNumber( 1 )
-				).fetch( page * 10, 10 );
-		return new Result<>( fetched.total().hitCountLowerBound(), fetched.hits().stream().map( BookDto::new ).toList() );
+				)
+				.highlighter( f -> f.fastVector().numberOfFragments( 1 ).fragmentSize( 10_000 ).noMatchSize( 10_000 ) )
+				.fetch( page * 10, 10 );
+		return new Result<>( fetched.total().hitCountLowerBound(), fetched.hits() );
 	}
 
 	public Result<BookDto> findBooks(String q, List<Genre> genres, int page) {
@@ -117,7 +122,7 @@ public class BookService {
 					if ( q != null && !q.isEmpty() ) {
 						root.add( f.match().field( "title" )
 								.field( "summary" )
-								//.field( "author" )
+								.field( "author.name" )
 								.matching( q ) );
 					}
 

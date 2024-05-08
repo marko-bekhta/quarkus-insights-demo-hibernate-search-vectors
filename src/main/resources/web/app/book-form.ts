@@ -5,7 +5,8 @@ import debounce from 'lodash/debounce';
 export const BOOK_SEARCH_START_EVENT = 'book-start';
 export const BOOK_SEARCH_RESULT_EVENT = 'book-result';
 export const BOOK_SEARCH_NEXT_PAGE_EVENT = 'book-next-page';
-export const BOOK_SEARCH_FIND_SIMILAR_EVENT = 'book-find-similar';
+export const BOOK_SEARCH_SIMILAR_NEXT_EVENT = 'book-similar-next';
+export const BOOK_SEARCH_SIMILAR_RESULT_EVENT = 'book-similar-result';
 
 export interface BookSearchResult {
     hits: BookSearchHit[];
@@ -95,13 +96,11 @@ export class BookForm extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         this.addEventListener(BOOK_SEARCH_NEXT_PAGE_EVENT, this._handleNextPage);
-        this.addEventListener(BOOK_SEARCH_FIND_SIMILAR_EVENT, this._handleFindSimilar);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
         this.removeEventListener(BOOK_SEARCH_NEXT_PAGE_EVENT, this._handleNextPage);
-        this.removeEventListener(BOOK_SEARCH_FIND_SIMILAR_EVENT, this._handleFindSimilar);
     }
 
     private _search = () => {
@@ -174,14 +173,6 @@ export class BookForm extends LitElement {
     private _handleNextPage = (e: CustomEvent) => {
         this._page++;
         this._search();
-    }
-
-    private _handleFindSimilar(e: CustomEvent) {
-        this._clearSearch();
-        this._requestType = 'similar';
-        this._formData = {
-            book: e.detail.book
-        };
     }
 
     private _isInput(el: HTMLFormElement) {

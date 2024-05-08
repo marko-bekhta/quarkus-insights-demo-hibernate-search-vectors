@@ -1,12 +1,12 @@
 import {css, html, LitElement} from 'lit';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
-import {customElement, property, state} from 'lit/decorators.js';
+import {customElement, property} from 'lit/decorators.js';
 
 /**
  * This component is a single guide hit in the search results
  */
-@customElement('book-guide')
-export class BookItem extends LitElement {
+@customElement('book-similar-item')
+export class BookSimilarItem extends LitElement {
 
     static styles = css`
         :host {
@@ -28,6 +28,7 @@ export class BookItem extends LitElement {
         .book-guide {
             display: flex;
             column-gap: 20px;
+            flex-direction: column;
         }
 
         .book-guide a {
@@ -73,9 +74,10 @@ export class BookItem extends LitElement {
 
         .book-guide div {
             margin: 1rem 0 0 0;
-            font-size: 1rem;
-            line-height: 1.5rem;
+            font-size: 12px;
+            line-height: 1rem;
             font-weight: 400;
+            width: 250px;
         }
 
         .book-guide .content-highlights {
@@ -101,6 +103,7 @@ export class BookItem extends LitElement {
         .genres {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
 
             p {
                 border-radius: 10px;
@@ -109,6 +112,8 @@ export class BookItem extends LitElement {
                 padding: 5px 20px 5px 20px;
                 font-size: 0.7rem;
                 cursor: pointer;
+                margin-block-start: 0;
+                margin-block-end: 0;
 
                 &:hover {
                     background: #999;
@@ -118,11 +123,7 @@ export class BookItem extends LitElement {
         }
 
         .book-cover img {
-            width: 200px;
-        }
-        
-        .book-similar {
-            margin-left: 5em;
+            width: 150px;
         }
     `;
 
@@ -135,8 +136,6 @@ export class BookItem extends LitElement {
     @property({type: String}) genres: string | [string]
 
     private _form: HTMLElement;
-    @state()
-    private _showSimilar: boolean = false;
 
     connectedCallback() {
         this._form = document.querySelector("book-form");
@@ -155,57 +154,24 @@ export class BookItem extends LitElement {
     }
 
 
-    _handleFindSimilar(e){
-        console.log(e);
-        this._showSimilar = true;
-    }
-
     render() {
-        if (this._showSimilar) {
-            return html`
-                <div aria-label="Book Hit">
-                    <div class="book-hit book-guide">
-                        <div class="book-cover">
-                            <img src="/api/image/${this.coverLocation}" alt="book cover"/>
-                        </div>
-                        <div>
-                            <h3>
-                                <span>${this._renderHTML(this.title)}</span>
-                            </h3>
-                            <h5>${this.author?.name}</h5>
-                            <div class="summary">
-                                <p>${this._renderHTML(this.summary)}</p>
-                            </div>
-                            <div class="genres">${this._renderHTML(this.genres)}</div>
-                        </div>
-                    </div>
-                    <div class="book-similar">
-                        <book-similar bookId="${this.id}"></book-similar>
-                    </div>
+        return html`
+            <div class="book-hit book-guide" aria-label="Book Hit">
+                <div class="book-cover">
+                    <img src="/api/image/${this.coverLocation}" alt="book cover"/>
                 </div>
-            `;
-        } else {
-            return html`
-                <div class="book-hit book-guide" aria-label="Book Hit">
-                    <div class="book-cover">
-                        <img src="/api/image/${this.coverLocation}" alt="book cover"/>
+                <div>
+                    <h3>
+                        <span>${this._renderHTML(this.title)}</span>
+                    </h3>
+                    <h5>${this.author?.name}</h5>
+                    <div class="summary">
+                        <p>${this._renderHTML(this.summary)}</p>
                     </div>
-                    <div>
-                        <h3>
-                            <span>${this._renderHTML(this.title)}</span>
-                            <div data-id="${this.id}" class="similar-books-button" @click="${this._handleFindSimilar}">
-                                Find similar
-                            </div>
-                        </h3>
-                        <h5>${this.author?.name}</h5>
-                        <div class="summary">
-                            <p>${this._renderHTML(this.summary)}</p>
-                        </div>
-                        <div class="genres">${this._renderHTML(this.genres)}</div>
-                    </div>
+                    <div class="genres">${this._renderHTML(this.genres)}</div>
                 </div>
-            `;
-        }
+            </div>
+        `;
     }
 
     private _renderHTML(content?: string | [string]) {

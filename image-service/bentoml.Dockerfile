@@ -21,4 +21,4 @@ COPY --chown=dev:dev service.py /home/dev/service.py
 EXPOSE     3000
 
 CMD ["bash"]
-# bentoml serve service:clip
+# bentoml serve service:CLIP

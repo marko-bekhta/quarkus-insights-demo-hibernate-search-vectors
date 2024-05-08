@@ -19,11 +19,14 @@ nav.search {
     justify-content: space-around;
     background-color: var(--top-nav-bg);
     gap: 20px;
-    padding: 0 10px;
     @media screen and (max-width: 768px) {
         gap: 10px;
     }
 
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
 }
 
 .logo {
@@ -36,10 +39,12 @@ nav.search {
     font-weight: bold;
     align-content: center;
     text-decoration: none;
+    padding-left: 10px;
 }
 
 book-form {
     flex-grow: 1;
+    padding-right: 10px;
 }
 
 .title {
