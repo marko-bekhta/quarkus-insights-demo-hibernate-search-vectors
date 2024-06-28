@@ -44,22 +44,21 @@ public class BookService {
 	@Transactional
 	public Book save(BookDto book) {
 		Book bookEntity;
-		if ( book.getId() != null ) {
-			bookEntity = entityManager.getReference( Book.class, book.getId() );
+		if ( book.id() != null ) {
+			bookEntity = entityManager.getReference( Book.class, book.id() );
 		}
 		else {
 			bookEntity = new Book();
 			entityManager.persist( bookEntity );
-			book.setId( book.getId() );
 		}
 
-		Author author = entityManager.getReference( Author.class, book.getAuthor().getId() );
+		Author author = entityManager.getReference( Author.class, book.author().id() );
 		bookEntity.author = author;
-		String title = book.getTitle();
+		String title = book.title();
 		bookEntity.title = title;
-		Set<Genre> genres = book.getGenres();
+		Set<Genre> genres = book.genres();
 		bookEntity.genres = genres;
-		String summary = book.getSummary();
+		String summary = book.summary();
 		bookEntity.summary = summary;
 
 		return bookEntity;
