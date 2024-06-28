@@ -13,27 +13,10 @@ public class Author {
 
 	@Id
 	@GeneratedValue
-	private Long id;
+	public Long id;
 
 	@Column(length = 512)
 	@FullTextField(analyzer = "index", searchAnalyzer = "search", highlightable = Highlightable.FAST_VECTOR)
-	private String name;
+	public String name;
 
-	public Long getId() {
-		return id;
-	}
-
-	public Author setId(Long id) {
-		this.id = id;
-		return this;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public Author setName(String name) {
-		this.name = name;
-		return this;
-	}
 }

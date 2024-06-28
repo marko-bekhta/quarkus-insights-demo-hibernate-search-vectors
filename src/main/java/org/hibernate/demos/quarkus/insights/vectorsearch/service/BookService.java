@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.hibernate.demos.quarkus.insights.vectorsearch.domain.Author;
@@ -52,10 +53,14 @@ public class BookService {
 			book.setId( book.getId() );
 		}
 
-		bookEntity.setAuthor( entityManager.getReference( Author.class, book.getAuthor().getId() ) );
-		bookEntity.setTitle( book.getTitle() );
-		bookEntity.setGenres( book.getGenres() );
-		bookEntity.setSummary( book.getSummary() );
+		Author author = entityManager.getReference( Author.class, book.getAuthor().getId() );
+		bookEntity.author = author;
+		String title = book.getTitle();
+		bookEntity.title = title;
+		Set<Genre> genres = book.getGenres();
+		bookEntity.genres = genres;
+		String summary = book.getSummary();
+		bookEntity.summary = summary;
 
 		return bookEntity;
 	}
@@ -70,8 +75,8 @@ public class BookService {
 	@Transactional
 	public void addCoverImage(Book bookEntity, byte[] coverImage) {
 		Path path = saveImage( coverImage );
-		bookEntity.setCoverLocation( path.getFileName() );
-		bookEntity.setCoverEmbedding( embeddingService.imageEmbedding( path ).get( 0 ) );
+		bookEntity.coverLocation = path.getFileName();
+		bookEntity.coverEmbedding = embeddingService.imageEmbedding( path ).get( 0 );
 	}
 
 
@@ -93,13 +98,13 @@ public class BookService {
 		SearchResult<BookDto> fetched = session.search( Book.class )
 				.select( BookDto.class )
 				.where( f -> f.bool()
-						.must( f.terms().field( "genres" ).matchingAny( book.getGenres() ) )
-						.should( f.knn( total ).field( "coverEmbedding" ).matching( book.getCoverEmbedding() )
+						.must( f.terms().field( "genres" ).matchingAny( book.genres ) )
+						.should( f.knn( total ).field( "coverEmbedding" ).matching( book.coverEmbedding )
 								.requiredMinimumSimilarity( 0.60f )
 								.filter( f.not( f.id().matching( id ) ) )
 						)
 						.should( f.knn( total ).field( "summary_embedding" )
-								.matching( textEmbeddingModelBridge.toEmbedding( book.getSummary() ) )
+								.matching( textEmbeddingModelBridge.toEmbedding( book.summary ) )
 								.requiredMinimumSimilarity( 0.70f )
 								.filter( f.not( f.id().matching( id ) ) )
 						)

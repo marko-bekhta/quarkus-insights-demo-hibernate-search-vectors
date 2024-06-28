@@ -10,8 +10,8 @@ public class AuthorDto extends Identifiable<Long> {
 	}
 
 	public AuthorDto(Author author) {
-		this.id = author.getId();
-		this.name = author.getName();
+		this.id = author.id;
+		this.name = author.name;
 	}
 
 	public String getName() {
