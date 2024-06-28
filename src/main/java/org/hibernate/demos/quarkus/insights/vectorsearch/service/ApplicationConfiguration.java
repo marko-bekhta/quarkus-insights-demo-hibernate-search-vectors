@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 import io.smallrye.config.ConfigMapping;
 
-@ConfigMapping(prefix = "quarkus.insights.vectorsearch")
+@ConfigMapping(prefix = "app")
 public interface ApplicationConfiguration {
 
 	Path imagesRootPath();
