@@ -28,12 +28,12 @@ public class BookDto extends Identifiable<Long> {
 	}
 
 	public BookDto(Book book) {
-		this.id = book.getId();
-		this.title = book.getTitle();
-		this.summary = book.getSummary();
-		this.genres = book.getGenres();
-		this.coverLocation = book.getCoverLocation().getFileName().toString();
-		this.author = new AuthorDto( book.getAuthor() );
+		this.id = book.id;
+		this.title = book.title;
+		this.summary = book.summary;
+		this.genres = book.genres;
+		this.coverLocation = book.coverLocation.getFileName().toString();
+		this.author = new AuthorDto( book.author );
 
 	}
 
