@@ -1,6 +1,5 @@
 package org.hibernate.demos.quarkus.insights.vectorsearch.search;
 
-import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
@@ -12,7 +11,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class TextEmbeddingModelBridge implements ValueBridge<String, float[]> {
 	public static final int DIMENSION = 384;
-	public static final VectorSimilarity SIMILARITY = VectorSimilarity.COSINE;
 
 	EmbeddingModel embeddingModel = new AllMiniLmL6V2QuantizedEmbeddingModel();
 
