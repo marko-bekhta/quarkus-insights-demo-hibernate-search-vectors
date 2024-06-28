@@ -52,14 +52,10 @@ public class BookService {
 			entityManager.persist( bookEntity );
 		}
 
-		Author author = entityManager.getReference( Author.class, book.author().id() );
-		bookEntity.author = author;
-		String title = book.title();
-		bookEntity.title = title;
-		Set<Genre> genres = book.genres();
-		bookEntity.genres = genres;
-		String summary = book.summary();
-		bookEntity.summary = summary;
+		bookEntity.author = entityManager.getReference( Author.class, book.author().id() );
+		bookEntity.title = book.title();
+		bookEntity.genres = book.genres();
+		bookEntity.summary = book.summary();
 
 		return bookEntity;
 	}
