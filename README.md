@@ -1,51 +1,34 @@
 # hibernate-search-vectors
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This demo application provides fulltext search capabilities to search over the book database 
+and allows to find similar books using vector search.
 
+This project uses Quarkus, the Supersonic Subatomic Java Framework.
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-## Running the application in dev mode
+## Running the demo 
 
-You can run your application in dev mode that enables live coding using:
-```shell script
+Before starting the application make sure that the AI service that provides image cover embeddings is up and running.
+1. Build the [`bentoml.Dockerfile`](image-service%2Fbentoml.Dockerfile)
+```bash
+docker build -t bento-ml -f image-service/bentoml.Dockerfile image-service
+```
+2. Run the service with cache directory mounted (to prevent re-downloads between runs)
+```bash
+docker run --rm -t -i -v /path/to/your/local/cache/dir/to/use:/home/dev/.cache -u $UID:$GID -p 3000:3000 bento-ml:latest
+```
+3. Start the Quarkus application, e.g. in running the application in dev mode from a command line:
+```bash
 ./mvnw compile quarkus:dev
 ```
+4. Once started and this is an initial run call the import endpoint. 
+It will take books listed in [books.txt](data%2Fbooks.txt) and scrape the data into the DB 
+while populating the search index at the same time.
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
-
-## Packaging and running the application
-
-The application can be packaged using:
-```shell script
-./mvnw package
+```http request
+GET localhost:8080/api/import
 ```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/hibernate-search-vectors-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
+5. Open the application UI by going to the http://localhost:8080
 
 ## Related Guides
 
@@ -53,19 +36,4 @@ If you want to learn more about building native executables, please consult http
 - Hibernate ORM ([guide](https://quarkus.io/guides/hibernate-orm)): Define your persistent model with Hibernate ORM and Jakarta Persistence
 - Hibernate Search + Elasticsearch ([guide](https://quarkus.io/guides/hibernate-search-orm-elasticsearch)): Automatically index your Hibernate entities in Elasticsearch
 - JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+- Hibernate Search 7.1.1.Final: [Reference Documentation](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/)
