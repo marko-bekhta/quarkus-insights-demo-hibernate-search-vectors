@@ -1,7 +1,7 @@
-# hibernate-search-vectors
+# Hibernate Search Vectors Demo App: Book Finder
 
 This demo application provides fulltext search capabilities to search over the book database 
-and allows to find similar books using vector search.
+and allows to find similar books using the vector search.
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
@@ -16,6 +16,10 @@ docker build -t bento-ml -f image-service/bentoml.Dockerfile image-service
 2. Run the service with cache directory mounted (to prevent re-downloads between runs)
 ```bash
 docker run --rm -t -i -v /path/to/your/local/cache/dir/to/use:/home/dev/.cache -u $UID:$GID -p 3000:3000 bento-ml:latest
+
+# once inside of the running container execute:
+
+bentoml serve service:CLIP
 ```
 3. Start the Quarkus application, e.g. in running the application in dev mode from a command line:
 ```bash
@@ -26,11 +30,17 @@ It will take books listed in [books.txt](data%2Fbooks.txt) and scrape the data i
 while populating the search index at the same time.
 
 ```http request
-GET localhost:8080/api/import
+GET http://localhost:8080/api/import
 ```
 5. Open the application UI by going to the http://localhost:8080
 
-## Related Guides
+## <a id="links" /> See also
+
+- [Slides](docs/2024-07-Quarkus-Insights-Hibernate-Search-7.1-and-Vector-Search.pdf)
+- [Diagrams](docs/diagrams.adoc)
+- [Recording](https://www.youtube.com/live/ThH8sJC69zU)
+
+### Related Guides
 
 - REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
 - Hibernate ORM ([guide](https://quarkus.io/guides/hibernate-orm)): Define your persistent model with Hibernate ORM and Jakarta Persistence
