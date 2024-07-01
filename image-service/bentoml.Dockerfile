@@ -9,8 +9,8 @@ RUN        chown -R dev:dev /home/dev
 # From here we run everything as dev user
 USER dev
 
-ENV        HOME /home/dev
-ENV        PATH $HOME/bin:$HOME/.local/bin:$PATH
+ENV        HOME="/home/dev"
+ENV        PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 WORKDIR    /home/dev/
 RUN git clone https://github.com/bentoml/BentoClip.git
