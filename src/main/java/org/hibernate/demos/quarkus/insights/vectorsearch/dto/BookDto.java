@@ -31,4 +31,8 @@ public record BookDto(
 				coverLocation, new HashSet<>( genres )
 		);
 	}
+
+	public BookDto(String title, String summary, Set<Genre> genres, AuthorDto author) {
+		this( null, title, summary, author, null, genres );
+	}
 }
